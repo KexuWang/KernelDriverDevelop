@@ -6,6 +6,7 @@
 #include "FileOper.h"
 
 
+
 #pragma INITCODE
 VOID CreateFileTest()
 {
@@ -271,6 +272,27 @@ VOID WriteFileTest()
 
 	ExFreePool(pBuffer);
 }
+NTSTATUS ZwDeleteFile( _In_ POBJECT_ATTRIBUTES ObjectAttributes );
+//删除文件
+#pragma INITCODE
+VOID DeleteFileTest()
+{
+	IO_STATUS_BLOCK		iostatus;
+	OBJECT_ATTRIBUTES	objFileObjectAttributes;
+	UNICODE_STRING		wstrFilePath;
+
+	KdBreakPoint();
+	RtlInitUnicodeString(&wstrFilePath, L"\\??\\C:\\aa.exe");
+	InitializeObjectAttributes(&objFileObjectAttributes,
+							   &wstrFilePath,
+							   OBJ_CASE_INSENSITIVE|OBJ_KERNEL_HANDLE,//对大小写敏感 
+							   NULL,
+							   NULL);
+	ZwDeleteFile(&objFileObjectAttributes);
+	KdBreakPoint();
+
+}
+
 
 #pragma INITCODE
 VOID ReadFileTest()
@@ -355,6 +377,8 @@ VOID FileTest()
 	WriteFileTest();
 
 	ReadFileTest();
+	DeleteFileTest();
+	
 
 }
 
@@ -407,6 +431,7 @@ NTSTATUS CreateDevice(IN PDRIVER_OBJECT	pDriverObject)
 	UNICODE_STRING devName;
 	RtlInitUnicodeString(&devName, L"\\Device\\MyWDKDevice");
 
+
 	//创建设备
 	status = IoCreateDevice(pDriverObject,
 							sizeof(DEVICE_EXTENSION),
@@ -448,13 +473,18 @@ VOID DriverUnload(IN PDRIVER_OBJECT pDriverObject)
 {
 	PDEVICE_OBJECT	pNextObj;
 	KdPrint(("Enter DriverUnload\n"));
-	pNextObj = pDriverObject->DeviceObject;
-	while (pNextObj != NULL)
-	{
-		PDEVICE_OBJECT	pNextNextObj= pNextObj->NextDevice;
-		IoDeleteDevice(pNextObj);
-		pNextObj = pNextNextObj;
-	}
+	UNICODE_STRING devName;
+	RtlInitUnicodeString(&devName, L"\\Device\\MyWDKDevice");
+	UNICODE_STRING symLinkName;
+	RtlInitUnicodeString(&symLinkName, L"\\??\\HelloWDK");
+
+	//pNextObj = pDriverObject->DeviceObject;
+	//while (pNextObj != NULL)
+	//{
+	//	PDEVICE_OBJECT	pNextNextObj= pNextObj->NextDevice;
+	//	IoDeleteDevice(pNextObj);
+	//	pNextObj = pNextNextObj;
+	//}
 }
 
 /************************************************************************

