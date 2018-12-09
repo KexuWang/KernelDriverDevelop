@@ -471,20 +471,14 @@ NTSTATUS CreateDevice(IN PDRIVER_OBJECT	pDriverObject)
 #pragma PAGEDCODE
 VOID DriverUnload(IN PDRIVER_OBJECT pDriverObject)
 {
-	PDEVICE_OBJECT	pNextObj;
 	KdPrint(("Enter DriverUnload\n"));
-	UNICODE_STRING devName;
-	RtlInitUnicodeString(&devName, L"\\Device\\MyWDKDevice");
+
 	UNICODE_STRING symLinkName;
 	RtlInitUnicodeString(&symLinkName, L"\\??\\HelloWDK");
+	IoDeleteSymbolicLink(&symLinkName);
 
-	//pNextObj = pDriverObject->DeviceObject;
-	//while (pNextObj != NULL)
-	//{
-	//	PDEVICE_OBJECT	pNextNextObj= pNextObj->NextDevice;
-	//	IoDeleteDevice(pNextObj);
-	//	pNextObj = pNextNextObj;
-	//}
+	PDEVICE_OBJECT deviceObject = pDriverObject->DeviceObject;
+	IoDeleteDevice(deviceObject);
 }
 
 /************************************************************************
