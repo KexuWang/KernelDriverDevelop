@@ -1,8 +1,3 @@
-/************************************************************************
-* 文件名称:FileOper.cpp
-* 作    者:kexwan
-* 完成日期:2019-12-3
-*************************************************************************/
 #include "FileOper.h"
 
 
@@ -16,8 +11,7 @@ VOID CreateFileTest()
 	UNICODE_STRING		logFileUnicodeString;
 
 	//初始化UNICODE_STRING字符串
-	RtlInitUnicodeString(&logFileUnicodeString,L"\\??\\C:\\1.log");
-	//或者写成 "\\Device\\HarddiskVolume1\\1.LOG"
+	RtlInitUnicodeString(&logFileUnicodeString,L"\\??\\C:\\test.log");
 
 
 	//初始化objectAttributes
@@ -65,8 +59,7 @@ VOID OpenFileTest2()
 	UNICODE_STRING		logFileUnicodeString;
 
 	//初始化UNICODE_STRING字符串
-	RtlInitUnicodeString(&logFileUnicodeString, L"\\??\\C:\\1.log");
-	//或者写成 "\\Device\\HarddiskVolume1\\1.LOG"
+	RtlInitUnicodeString(&logFileUnicodeString, L"\\??\\C:\\test.log");
 
 
 	//初始化objectAttributes
@@ -109,8 +102,7 @@ VOID OpenFileTest1()
 	UNICODE_STRING		logFileUnicodeString;
 
 	//初始化UNICODE_STRING字符串
-	RtlInitUnicodeString(&logFileUnicodeString, L"\\??\\C:\\1.log");
-	//或者写成 "\\Device\\HarddiskVolume1\\1.LOG"
+	RtlInitUnicodeString(&logFileUnicodeString, L"\\??\\C:\\test.log");
 
 	//初始化objectAttributes
 	InitializeObjectAttributes(&objectAttributes,
@@ -157,8 +149,7 @@ VOID FileAttributeTest()
 	UNICODE_STRING		logFileUnicodeString;
 
 	//初始化UNICODE_STRING字符串
-	RtlInitUnicodeString(&logFileUnicodeString,L"\\??\\C:\\1.log");
-	//或者写成 "\\Device\\HarddiskVolume1\\1.LOG"
+	RtlInitUnicodeString(&logFileUnicodeString,L"\\??\\C:\\test.log");
 
 	//初始化objectAttributes
 	InitializeObjectAttributes(&objectAttributes,
@@ -223,8 +214,8 @@ VOID WriteFileTest()
 	UNICODE_STRING		logFileUnicodeString;
 
 	//初始化UNICODE_STRING字符串
-	RtlInitUnicodeString(&logFileUnicodeString,L"\\??\\C:\\1.log");
-	//或者写成 "\\Device\\HarddiskVolume1\\1.LOG"
+	RtlInitUnicodeString(&logFileUnicodeString,L"\\??\\C:\\test.log");
+	//或者写成 "\\Device\\HarddiskVolume1\\test.log"
 
 	//初始化objectAttributes
 	InitializeObjectAttributes(&objectAttributes,
@@ -303,8 +294,8 @@ VOID ReadFileTest()
 	UNICODE_STRING		logFileUnicodeString;
 
 	//初始化UNICODE_STRING字符串
-	RtlInitUnicodeString(&logFileUnicodeString, L"\\??\\C:\\1.log");
-	//或者写成 "\\Device\\HarddiskVolume1\\1.LOG"
+	RtlInitUnicodeString(&logFileUnicodeString, L"\\??\\C:\\test.log");
+	//或者写成 "\\Device\\HarddiskVolume1\\test.log"
 
 	//初始化objectAttributes
 	InitializeObjectAttributes(&objectAttributes,
