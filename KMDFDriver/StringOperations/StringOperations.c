@@ -70,7 +70,6 @@ VOID StringInitTest()
 	KdBreakPoint();
 }
 
-//D、字符串复制，比较，（大小写，整数和字串）相互转换
 #pragma INITCODE
 VOID StringCopyTest()
 {
